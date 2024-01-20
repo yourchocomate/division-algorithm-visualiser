@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Division Algorithm Visualization</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="flex-col">
+    <h1>Division Algorithm Visualization</h1>
+    <div class="flex-row">
+        <input type="number" id="dividend" placeholder="Dividend" style="margin-right: 20px;">
+        <input type="number" id="divisor" placeholder="Divisor" style="margin-right: 20px;">
+        <select id="speed" style="margin-right: 20px;">
+            <option value="2">Very Slow</option>
+            <option value="1">Slow</option>
+            <option value="0.5" selected>Medium</option>
+            <option value="0.25">Fast</option>
+        </select>
+        <button onclick="calculate()">Calculate</button>
+    </div>
+    <p style="margin-top: 20px;">Note: The dividend and divisor should be positive integers and dividend must be greater.</p>
+</div>
+<div class="flex-row" id="table">
+    <div class="flex-col restoring">
+        <h2>Restoring Division</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>A</th>
+                    <th>Q</th>
+                    <th>M</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="restoring">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex-col non-restoring">
+        <h2>Non-Restoring Division</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>A</th>
+                    <th>Q</th>
+                    <th>M</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="nonRestoring">
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="flex-col" id="result">
+    <div class="flex-row">
+        <div class="flex-col restoring">
+            <h2>Restoring Division</h2>
+            <p>Quotient: <span id="resQ"></span></p>
+            <p>Remainder: <span id="resR"></span></p>
+        </div>
+
+        <div class="flex-col non-restoring">
+            <h2>Non-Restoring Division</h2>
+            <p>Quotient: <span id="nonResQ"></span></p>
+            <p>Remainder: <span id="nonResR"></span></p>
+        </div>
+    </div>
+</div>
+
+<script src="helpers.js"></script>
+<script src="script.js"></script>
+
+<script>
+
+    const tableContainer = document.getElementById("table");
+    const resultContainer = document.getElementById("result");
+    
+    tableContainer.style.opacity = 0.2;
+    resultContainer.style.opacity = 0.2;
+
+    function calculate() {
+
+        tableContainer.style.opacity = 1;
+        resultContainer.style.opacity = 1;
+
+        document.getElementById("restoring").innerHTML = "";
+        document.getElementById("nonRestoring").innerHTML = "";
+
+        const dividend = document.getElementById("dividend").value;
+        const divisor = document.getElementById("divisor").value;
+        const speed = document.getElementById("speed").value;
+
+        if (dividend === "" || divisor === "") {
+            alert("Please enter both dividend and divisor");
+            return;
+        }
+
+        if (divisor === "0") {
+            alert("Divisor cannot be 0");
+            return;
+        }
+
+        if (dividend < divisor) {
+            alert("Dividend must be greater than divisor");
+            return;
+        }
+
+        let dd = decimalToBinary(dividend).toString();
+        const dr = decimalToBinary(divisor).toString().padStart(dd.length + 1, '0');
+        const accumulator = "0".padStart(dd.length + 1, '0');
+
+        const restoring = restoringDivision(dd, dr, accumulator);
+        const nonRestoring = nonRestoringDivision(dd, dr, accumulator);
+
+        printSteps(restoring.steps, "restoring", speed);
+        printSteps(nonRestoring.steps, "nonRestoring", speed);
+
+        document.getElementById("resQ").innerHTML = binaryToDecimal(restoring.Q);
+        document.getElementById("resR").innerHTML = binaryToDecimal(restoring.A);
+        document.getElementById("nonResQ").innerHTML = binaryToDecimal(nonRestoring.Q);
+        document.getElementById("nonResR").innerHTML = binaryToDecimal(nonRestoring.A);
+    }
+
+</script>
+
+</body>
+</html>
